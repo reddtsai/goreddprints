@@ -1,0 +1,21 @@
+syntax = "proto3";
+package model;
+
+option go_package = ".;model";
+
+message sql {
+    string addr = 1;
+    string user = 2;
+    string passwd = 3;
+    string db = 4;
+}
+
+message redis {
+    string addr = 1;
+    string passwd =2;
+}
+
+message redisCluster {
+    repeated string addr = 1;
+    string passwd =2;
+}
