@@ -7,11 +7,12 @@ import (
 )
 
 type etcdSCM struct {
-	v3 *clientv3.Client
+	cli *clientv3.Client
+	kv  clientv3.KV
 }
 
 func newEtcdClient(addr []string) (*etcdSCM, error) {
-	cli, err := clientv3.New(clientv3.Config{
+	client, err := clientv3.New(clientv3.Config{
 		Endpoints:   addr,
 		DialTimeout: timeout,
 	})
@@ -19,35 +20,43 @@ func newEtcdClient(addr []string) (*etcdSCM, error) {
 		return nil, err
 	}
 	etcd := &etcdSCM{
-		v3: cli,
+		cli: client,
+		kv:  clientv3.NewKV(client),
 	}
 	return etcd, nil
 }
 
 // Close a etcd client
 func (c *etcdSCM) Close() {
-	c.v3.Close()
+	c.cli.Close()
 }
 
 // Put a value by key to etcd
 func (c *etcdSCM) Put(key string, val string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	_, err := c.v3.Put(ctx, key, val)
+	_, err := c.kv.Put(ctx, key, val)
 	defer cancel()
 	return err
 }
 
 // Get a value by key from etcd
-func (c *etcdSCM) Get(key string) ([]byte, error) {
+func (c *etcdSCM) Get(key string) (map[string][]byte, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	resp, err := c.v3.Get(ctx, key)
+	resp, err := c.kv.Get(ctx, key, clientv3.WithPrefix())
 	defer cancel()
 	if err != nil {
 		return nil, err
 	}
-	var buf []byte
-	if resp.Count > 0 {
-		buf = resp.Kvs[0].Value
+	buf := make(map[string][]byte)
+	for _, v := range resp.Kvs {
+		buf[string(v.Key)] = v.Value
 	}
 	return buf, nil
+}
+
+func (c *etcdSCM) Delete(key string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	_, err := c.kv.Delete(ctx, key)
+	defer cancel()
+	return err
 }

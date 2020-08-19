@@ -1,10 +1,14 @@
 syntax = "proto3";
-
 option go_package = ".;rpc";
-
+import "google/api/annotations.proto";
 
 service SampleService {
-    rpc SayHello (HelloRequest) returns (HelloReply) {}
+    rpc SayHello (HelloRequest) returns (HelloReply) {
+        option (google.api.http) = {
+            post: "/v1/example/echo"
+            body: "*"
+        };
+    }
 }  
 
 message HelloRequest {

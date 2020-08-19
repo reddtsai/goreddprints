@@ -31,5 +31,7 @@ func main() {
 		fmt.Println(err)
 	}
 	buf, err := m.Get("sql")
-	fmt.Println(string(buf))
+	for k, v := range buf {
+		fmt.Println(k, "-", string(v))
+	}
 }

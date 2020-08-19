@@ -11,7 +11,8 @@ const (
 // SCM is the interface for manager system configuration
 type SCM interface {
 	Put(string, string) error
-	Get(string) ([]byte, error)
+	Get(string) (map[string][]byte, error)
+	Delete(string) error
 	Close()
 }
 
