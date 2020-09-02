@@ -1,13 +1,5 @@
 .PHONY:
 
-# proto
-
-gen-proto-v1:
-	protoc -I proto --goV1_out=pkg/model proto/*.proto
-
-gen-proto-v2:
-	protoc -I proto --goV2_out=pkg/model proto/*.proto
-
 # etcd
 
 etcd-cluster-run:

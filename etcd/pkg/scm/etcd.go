@@ -11,7 +11,7 @@ type etcdSCM struct {
 	kv  clientv3.KV
 }
 
-func newEtcdClient(addr []string) (*etcdSCM, error) {
+func newEtcdClient(addr ...string) (*etcdSCM, error) {
 	client, err := clientv3.New(clientv3.Config{
 		Endpoints:   addr,
 		DialTimeout: timeout,
@@ -31,7 +31,7 @@ func (c *etcdSCM) Close() {
 	c.cli.Close()
 }
 
-// Put a value by key to etcd
+// Put key-value to etcd
 func (c *etcdSCM) Put(key string, val string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	_, err := c.kv.Put(ctx, key, val)
@@ -54,6 +54,7 @@ func (c *etcdSCM) Get(key string) (map[string][]byte, error) {
 	return buf, nil
 }
 
+// Delete key-value from etcd
 func (c *etcdSCM) Delete(key string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	_, err := c.kv.Delete(ctx, key)

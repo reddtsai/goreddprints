@@ -1,36 +1,27 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 
-	"github.com/reddtsai/goreddprints/etcd/pkg/model"
 	"github.com/reddtsai/goreddprints/etcd/pkg/scm"
 )
 
 func main() {
-	addr := []string{"localhost:2379", "localhost:12379", "localhost:22379"}
-	m, err := scm.NewSCM(addr)
+	m, err := scm.NewSCM("localhost:2379", "localhost:12379", "localhost:22379")
 	fmt.Println("scm ...")
 	if err != nil {
 		fmt.Println(err)
 	}
 	defer m.Close()
-	sql := &model.Sql{
-		Addr:   "0.0.0.0:3306",
-		Db:     "test",
-		User:   "admin",
-		Passwd: "1234",
-	}
-	p, err := json.Marshal(sql)
+	err = m.Put("/foo", "hello")
 	if err != nil {
 		fmt.Println(err)
 	}
-	err = m.Put("sql", string(p))
+	err = m.Put("/foo/bar", "world")
 	if err != nil {
 		fmt.Println(err)
 	}
-	buf, err := m.Get("sql")
+	buf, err := m.Get("/foo")
 	for k, v := range buf {
 		fmt.Println(k, "-", string(v))
 	}

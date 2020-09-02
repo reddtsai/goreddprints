@@ -17,6 +17,6 @@ type SCM interface {
 }
 
 // NewSCM return a SCM intance
-func NewSCM(addr []string) (SCM, error) {
-	return newEtcdClient(addr)
+func NewSCM(addr ...string) (SCM, error) {
+	return newEtcdClient(addr...)
 }
